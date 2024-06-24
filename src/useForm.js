@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { fetchAdditionalQuestions } from './mockApi';
 
 export const useForm = (initialValues, validate) => {
   const [values, setValues] = useState(initialValues);
@@ -13,38 +14,29 @@ export const useForm = (initialValues, validate) => {
       setErrors(validationErrors);
       setIsSubmitting(false);
       if (Object.keys(validationErrors).length === 0) {
-        const mockQuestions = [
-            `What do you think about the current state of ${values.surveyTopic}?`,
-            `What improvements would you suggest for ${values.surveyTopic}?`,
-          ];
-          setAdditionalQuestions(mockQuestions);
-          setSubmitted(true);
+        fetchAdditionalQuestions(values.surveyTopic)
+          .then((questions) => {
+            setAdditionalQuestions(questions);
+            setSubmitted(true);
+          })
+          .catch((error) => {
+            console.error("Error fetching additional questions:", error);
+          });
       }
     }
   }, [isSubmitting, values, validate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setValues({
       ...values,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  };
-
-  const fetchAdditionalQuestions = async (topic) => {
-    try {
-      const response = await fetch(`https://api.example.com/questions?topic=${topic}`);
-      const data = await response.json();
-      setAdditionalQuestions(data.questions);
-      setSubmitted(true);
-    } catch (error) {
-      console.error('Error fetching additional questions:', error);
-    }
   };
 
   return {
