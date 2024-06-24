@@ -30,6 +30,7 @@ const SurveyForm = () => {
     <div className="container">
       {!submitted ? (
         <form className="form" onSubmit={handleSubmit}>
+                      <h2>Survey Form</h2>
           <div className="form-group">
             <label htmlFor="fullName">Full Name</label>
             <input
